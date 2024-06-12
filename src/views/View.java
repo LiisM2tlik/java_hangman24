@@ -1,12 +1,17 @@
 package views;
 
+import helpers.GameTimer;
+import helpers.RealTimer;
+import models.Database;
 import models.Model;
+import models.datastructures.DataScore;
 import views.panels.GameBoard;
 import views.panels.LeaderBoard;
 import views.panels.Settings;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 
 /**
  * See on põhivaade ehk JFrame kuhu peale pannakse kõik muud JComponendid mida on mänguks vaja.
@@ -34,6 +39,11 @@ public class View extends JFrame {
      */
     private JTabbedPane tabbedPane;
 
+
+    // TODO realtimer ka
+    private GameTimer gameTimer;
+    private RealTimer realTimer;
+
     /**
      * View konstruktor. Põhiakna (JFrame) loomine ja sinna paneelide (JPanel) lisamine ja JComponendid
      * @param model mudel mis loodi MainApp-is
@@ -55,6 +65,10 @@ public class View extends JFrame {
         createTabbedPanel(); // Loome kolme vahelehega tabbedPaneli
 
         add(tabbedPane, BorderLayout.CENTER); // Paneme tabbedPaneli JFramele. JFrame layout on default BorderLayout
+
+        gameTimer = new GameTimer(this);
+        realTimer = new RealTimer(this);
+        realTimer.start();
     }
 
     private void createTabbedPanel() {
@@ -94,9 +108,17 @@ public class View extends JFrame {
         gameBoard.getBtnSend().setEnabled(false); // Nupp Saada ei ole klikitav
         gameBoard.getBtnCancel().setEnabled(false); // Nupp Katkesta ei ole klikitav
         gameBoard.getTxtChar().setEnabled(false); // Sisestuskast ei ole aktiivne
+        gameBoard.getTxtChar().setText(""); // tee sisestus kast tühjaks
     }
 
     // GETTERID Paneelide (vahelehetede)
+    /**
+     * mänguaja objekt .stop() .setRunning() jne
+     * @return mänguaja objekt
+     */
+    public GameTimer getGameTimer() {
+        return gameTimer;
+    }
     public Settings getSettings() {
         return settings;
     }
@@ -107,5 +129,30 @@ public class View extends JFrame {
 
     public LeaderBoard getLeaderBoard() {
         return leaderBoard;
+    }
+
+    public void updateScoreTable() {
+        for(DataScore ds : model.getDataScores()) {
+            String gameTime = ds.gameTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            String name = ds.playerName();
+            String word = ds.word();
+            String chars = ds.missedChars();
+            String humanTime = convertSecToMMSS(ds.timeSeconds());
+            // lisab rea deafulttablemodeli mudelisse
+            model.getDtm().addRow(new Object[]{gameTime, name, word, chars, humanTime});
+
+            //System.out.println(gameTime);
+        }
+    }
+
+    /**
+     * muudab aja min on sekundites kujule mm:ss 90 sek on 1:30
+     * @param seconds sekundidn räisarv
+     * @return vormindatud sting
+     */
+    private String convertSecToMMSS(int seconds) {
+        int min = seconds / 60;
+        int sec = seconds % 60;
+        return String.format("%02d:%02d", min, sec);
     }
 }

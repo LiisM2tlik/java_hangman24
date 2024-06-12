@@ -30,9 +30,15 @@ public class Settings extends JPanel {
      * Sisaldab äraarvatava sõna kategooriat (andmebaasist). Algul "Kõik kategooriad"
      */
     private JComboBox<String> cmbCategory;
-    /**
+
+       /**
      * Uue mängu alustamise nupp
      */
+    private JLabel dbNameShow;
+    /**
+     * db faili nime näitamise silt
+     */
+
     private JButton btnNewGame;
     /**
      * TODO Selle nupu vajalikkus on küsimärgi all :)
@@ -85,20 +91,31 @@ public class Settings extends JPanel {
         components.add(lblCategory, gbc);
 
         // TODO muuta JComboBox sulgude sisu
-        cmbCategory = new JComboBox<>(new String[]{model.getChooseCategory()}); // Teksti massiiv ühe elemendiga
+        // cmbCategory = new JComboBox<>(new String[]{model.getChooseCategory()}); // Teksti massiiv ühe elemendiga
+        cmbCategory = new JComboBox<>(model.getCmbCategories());  // teksti massiiv kõikide elementidega. toob massiivi nähtavaks dropdown listi
         gbc.gridx = 1;
         gbc.gridy = 1;
         components.add(cmbCategory, gbc);
 
+        // näita db nime sil
+        dbNameShow = new JLabel(model.getDatabaseFile(), JLabel.CENTER);
+        dbNameShow.setForeground(Color.RED);
+        dbNameShow.setFont(new Font("Verdana", Font.BOLD, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        components.add(dbNameShow, gbc);
+
         // Kolmas rida kaks nuppu kõrvuti. Teine nupp küsitav :)
         btnNewGame = new JButton("Uus mäng");
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
         components.add(btnNewGame, gbc);
 
         btnLeaderboard = new JButton("Edetabel");
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         components.add(btnLeaderboard, gbc);
 
     }
