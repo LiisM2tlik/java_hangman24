@@ -12,11 +12,11 @@ public class GameBoard extends JPanel {
     /**
      * Klassisisene mudel, mille väärtus saadakse View konstruktorist ja loodud MainApp-is
      */
-    private Model model;
+    private final Model model;
     /**
      * GridBagLayout jaoks JComponent paigutamiseks "Excel" variandis
      */
-    private GridBagConstraints gbc = new GridBagConstraints();
+    private final GridBagConstraints gbc = new GridBagConstraints();
     /**
      * See silt (JLabel) näitab mängu aega kujul: mm:ss
      */
@@ -120,7 +120,7 @@ public class GameBoard extends JPanel {
 
         // Neljas rida
         btnSend = new JButton("Saada");
-        btnSend.setEnabled(false); // Nuppu ei saa klikkida
+        btnSend.setEnabled(true); // Nuppu ei saa klikkida muutsin falsist trueks(12.12)
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1; // Iga komponent ühte lahtrisse
@@ -141,8 +141,8 @@ public class GameBoard extends JPanel {
     private void createImagePlace(JPanel components) {
         lblImage = new JLabel();
         // TODO pildid mällu lugemata, seega võllapuud ei näe vaid värviline pildikast. Asendada temporaryImage() õigega
-       // ImageIcon imageIcon = new ImageIcon(temporaryImage()); // Sulgude osa täita õigesti ja pilt on maagiliselt näha
-        ImageIcon imageIcon = new ImageIcon(model.getImageFiles().getLast()); // Sulgude osa täita õigesti ja pilt on maagiliselt näha
+        ImageIcon imageIcon = new ImageIcon(temporaryImage()); // Sulgude osa täita õigesti ja pilt on maagiliselt näha
+        // ImageIcon imageIcon = new ImageIcon(model.getImageFiles().getLast()); // Sulgude osa täita õigesti ja pilt on maagiliselt näha
         lblImage.setIcon(imageIcon);
 
         gbc.gridx = 2; // Kolmas veerg
@@ -161,7 +161,7 @@ public class GameBoard extends JPanel {
         BufferedImage image = new BufferedImage(125, 125, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
-        graphics.setPaint(new Color(255, 0, 0));
+        graphics.setPaint(new Color(0, 255, 34));
         graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
         return image;
     }
@@ -175,6 +175,13 @@ public class GameBoard extends JPanel {
         lblResult.setFont(new Font("Courier New", Font.BOLD, 24)); // Kirjastiil ja suurus äraarvataval sõnal
         pnlResult.add(lblResult); // See paneel (pnlResult) on FlowLayout mitte GridBagLayout!
     }
+    public void displayWord(String word) {
+        StringBuilder underscores = new StringBuilder();
+        for (char _ : word.toCharArray()) {
+            underscores.append("_ ");
+        }
+        lblResult.setText(underscores.toString().trim());
+    }
 
     // Komponentide getterid
 
@@ -186,9 +193,6 @@ public class GameBoard extends JPanel {
         return txtChar;
     }
 
-    public JLabel getLblError() {
-        return lblError;
-    }
 
     public JButton getBtnSend() {
         return btnSend;
@@ -202,7 +206,22 @@ public class GameBoard extends JPanel {
         return lblImage;
     }
 
-    public JLabel getLblResult() {
-        return lblResult;
+    public void updateGameBoard() {
+        StringBuilder displayWord = new StringBuilder();
+        for (char c : model.getGuessedChars()) {
+            displayWord.append(c).append(' ');
+        }
+        lblResult.setText(displayWord.toString().trim());
+
+        // Update the wrong guesses label
+        lblError.setText("Vigased tähed: " + model.getWrongGuessesAsString());
+
+        // Update the hangman image
+        int imageIndex = Math.min(model.getWrongGuesses().size(), model.getImageFiles().size() - 1);
+        lblImage.setIcon(new ImageIcon(model.getImageFiles().get(imageIndex)));
+
+        // Reset the input field
+        txtChar.setText("");
+        txtChar.requestFocus();
     }
 }

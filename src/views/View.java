@@ -10,6 +10,7 @@ import views.panels.LeaderBoard;
 import views.panels.Settings;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 
@@ -54,7 +55,8 @@ public class View extends JFrame {
         setTitle("Poomismäng 2024 õpilased"); // JFrame titelriba tekst
         setPreferredSize(new Dimension(500, 250));
         // TODO arenduse lõpus keela akna suurendamine
-        // setResizable(false);
+
+        setResizable(false);
         getContentPane().setBackground(new Color(250,210,205)); // JFrame taustavärv (rõõsa)
 
         // Loome kolm vahelehte (JPanel)
@@ -67,7 +69,7 @@ public class View extends JFrame {
         add(tabbedPane, BorderLayout.CENTER); // Paneme tabbedPaneli JFramele. JFrame layout on default BorderLayout
 
         gameTimer = new GameTimer(this);
-        realTimer = new RealTimer(this);
+        RealTimer realTimer = new RealTimer(this);
         realTimer.start();
     }
 
@@ -79,7 +81,7 @@ public class View extends JFrame {
         tabbedPane.addTab("Edetabel", leaderBoard); // Vaheleht Mängulaud paneeliga gameBoard
 
         // TODO arenduse lõpus mängulaua vahelehte klikkida ei saa
-        // tabbedPane.setEnabledAt(1, false); // Vahelehte mängulaud ei saa klikkida
+        tabbedPane.setEnabledAt(1, false); // Vahelehte mängulaud ei saa klikkida
     }
 
     /**
@@ -132,6 +134,8 @@ public class View extends JFrame {
     }
 
     public void updateScoreTable() {
+        DefaultTableModel dtm = model.getDtm();
+        dtm.setRowCount(0);
         for(DataScore ds : model.getDataScores()) {
             String gameTime = ds.gameTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
             String name = ds.playerName();
@@ -154,5 +158,25 @@ public class View extends JFrame {
         int min = seconds / 60;
         int sec = seconds % 60;
         return String.format("%02d:%02d", min, sec);
+    }
+    public void setFirstPicture() {
+        ImageIcon imageIcon = new ImageIcon(model.getImageFiles().getFirst());
+        getGameBoard().getLblImage().setIcon(imageIcon);
+    }
+
+    public void updateScoresTable() {
+        DefaultTableModel dtm = model.getDtm();
+        dtm.setRowCount(0);
+        for(DataScore ds : model.getDataScores()) {
+            String gameTime = ds.gameTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            String name = ds.playerName();
+            String word = ds.word();
+            String chars = ds.missedChars();
+            String humanTime = convertSecToMMSS(ds.timeSeconds());
+            // lisab rea deafulttablemodeli mudelisse
+            model.getDtm().addRow(new Object[]{gameTime, name, word, chars, humanTime});
+
+            //System.out.println(gameTime);
+        }
     }
 }

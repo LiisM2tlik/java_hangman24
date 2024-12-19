@@ -15,7 +15,7 @@ public class Model {
      *  hangman_words_en.db - Inglisekeelsed sõnad, edetabel on tühi
      *  hangman_words_ee_test.db - Eestikeelsed sõnad, edetabel EI ole tühi
      */
-    private String databaseFile = "hangman_words_ee_test.db";
+    private String databaseFile = "hangman_words_ee.db";
     /**
      * kaust kus on võllapuu pildid
      */
@@ -37,12 +37,15 @@ public class Model {
      * edetabeli andmed listis
      */
     private List<DataScore> dataScores = new ArrayList<>();
+    private String currentWord;
+    private char[] guessedChars;
+    private List<Character> wrongGuesses;
 
     public Model(String dbName) {
         if(dbName != null) {
             this.databaseFile = dbName; // käsurealt saadud andmbaas kasutusel
         }
-        System.out.println(this.databaseFile);
+        // System.out.println(this.databaseFile);
         new Database(this); // Loome andmebaasi ühenduse
         readImagesFolder();
         selectedCategory = chooseCategory; // Vaikimisi "Kõik kategooriad"
@@ -58,6 +61,7 @@ public class Model {
 
     private void readImagesFolder() {
         // see loeb siis pilte kaustast
+        String imagesFolder = "images";
         File folder = new File(imagesFolder); // loome kausta objekti
         File[] files = folder.listFiles();
         for(File file : Objects.requireNonNull(files)) {
@@ -66,7 +70,12 @@ public class Model {
         // Collections.sort(imageFiles); // sorteerimiseks kasvavalt kausta sisu
         // System.out.println(imageFiles); // testimiseks, kas saan õige asja kätte ja kasutab
     }
-
+    public void startNewGame(String word) {
+        this.currentWord = word;
+        this.guessedChars = new char[word.length()];
+        Arrays.fill(guessedChars, '_');
+        this.wrongGuesses = new ArrayList<>();
+    }
     /**
      * Rippmenüü esimene valik enne kategooriaid
      * @return teksti "Kõik kategooriad"
@@ -123,6 +132,9 @@ public class Model {
         this.cmbCategories = cmbCategories;
     }
 
+    public String getWrongGuessesAsString() {
+        return getWrongGuesses().toString().replaceAll("[\\[\\]]", "");
+    }
     /**
      *
      * @return Deafulttablemodel
@@ -153,5 +165,15 @@ public class Model {
      */
     public void setDataScores(List<DataScore> dataScores) {
         this.dataScores = dataScores;
+    }
+
+    public char[] getGuessedChars() {
+        return guessedChars;
+    }
+    public List<Character> getWrongGuesses() {
+        return wrongGuesses;
+    }
+    public String getCurrentWord() {
+        return currentWord;
     }
 }

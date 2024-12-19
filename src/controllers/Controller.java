@@ -1,8 +1,6 @@
 package controllers;
 
-import listeners.ButtonCancel;
-import listeners.ButtonNew;
-import listeners.ComboboxChange;
+import listeners.*;
 import models.Model;
 import views.View;
 
@@ -17,5 +15,8 @@ public class Controller {
         //katkesta nupu funktsionaalsus
         view.getGameBoard().getBtnCancel().addActionListener(new ButtonCancel(model,view));
 
+        view.getGameBoard().getBtnSend().addActionListener(new ButtonSend(model, view));
+
+        view.getSettings().getBtnLeaderboard().addActionListener(new ButtonScores(model, view));
     }
 }
